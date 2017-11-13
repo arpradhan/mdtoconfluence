@@ -19,7 +19,29 @@ func TestReplaceStringHeading(t *testing.T) {
 	for _, c := range cases {
 		got := ReplaceStringHeading(c.in)
 		if got != c.want {
-			t.Errorf("ReplaceHeading(%q) == %q, want %q", c.in, got, c.want)
+			t.Errorf("ReplaceStringHeading(%q) == %q, want %q", c.in, got, c.want)
+		}
+	}
+}
+
+func TestReplaceStringBulletList(t *testing.T) {
+	cases := []struct {
+		in, want string
+	}{
+		{`
+- George Washington
+- John Adams
+* Thomas Jefferson
+* Abraham Lincoln`, `
+* George Washington
+* John Adams
+* Thomas Jefferson
+* Abraham Lincoln`},
+	}
+	for _, c := range cases {
+		got := ReplaceStringBulletList(c.in)
+		if got != c.want {
+			t.Errorf("ReplaceStringBulletList(%q) == %q, want %q", c.in, got, c.want)
 		}
 	}
 }

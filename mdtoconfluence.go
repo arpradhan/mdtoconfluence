@@ -8,7 +8,7 @@ import (
 	"strings"
 )
 
-// ReplaceStringHeading returns a heading formatted in confluence from markdown
+// ReplaceStringHeading returns a confluence formatted heading from markdown
 func ReplaceStringHeading(str string) string {
 	re := regexp.MustCompile(`(#{1,6}).+\n`)
 	matches := re.FindAllStringSubmatch(str, -1)
@@ -26,4 +26,23 @@ func ReplaceStringHeading(str string) string {
 
 	}
 	return strings.Join(parsedSlice, "")
+}
+
+// ReplaceStringBulletList returns a confluence formatted list from markdown
+func ReplaceStringBulletList(str string) string {
+	lines := strings.Split(str, "\n")
+	newLines := make([]string, 0)
+	for _, line := range lines {
+		re := regexp.MustCompile(`^(\*|-)(.+)`)
+		match := re.FindStringSubmatch(line)
+		var newLine string
+		if match == nil {
+			newLine = line
+		} else {
+			rest := match[2]
+			newLine = fmt.Sprintf("%s%s", "*", rest)
+		}
+		newLines = append(newLines, newLine)
+	}
+	return strings.Join(newLines, "\n")
 }

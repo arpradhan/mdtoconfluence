@@ -46,3 +46,41 @@ func ReplaceStringBulletList(str string) string {
 	}
 	return strings.Join(newLines, "\n")
 }
+
+// ReplaceStringNestedBulletList returns a confluence formatted nested list from markdown
+func ReplaceStringNestedBulletList(str string) string {
+	lines := strings.Split(str, "\n")
+	newLines := make([]string, 0)
+	for i, line := range lines {
+		re := regexp.MustCompile(` +(\*|-)`)
+		match := re.FindString(line)
+		var newLine string
+		if match == "" {
+			newLine = line
+		} else {
+			if i > 0 {
+				lastLine := lines[i-1]
+				re = regexp.MustCompile(`(\*|-) (.+)`)
+				firstLetterIndex := re.FindStringSubmatchIndex(lastLine)[4]
+				if len(match)-1 == firstLetterIndex {
+					re = regexp.MustCompile(`(\*|-)`)
+					nestedBulletIndex := re.FindStringIndex(line)[0]
+					if nestedBulletIndex == firstLetterIndex {
+						re = regexp.MustCompile(`( +).+`)
+						bulletNumber := re.FindStringSubmatchIndex(line)[3]/2 + 1
+						bulletSlice := make([]string, bulletNumber)
+						for j := 0; j < bulletNumber; j++ {
+							bulletSlice[j] = "*"
+						}
+						re = regexp.MustCompile(`(\*|-)(.+)`)
+						rest := re.FindStringSubmatch(line)[2]
+						newLine = fmt.Sprintf("%v%v", strings.Join(bulletSlice, ""), rest)
+					}
+				}
+
+			}
+		}
+		newLines = append(newLines, newLine)
+	}
+	return strings.Join(newLines, "\n")
+}

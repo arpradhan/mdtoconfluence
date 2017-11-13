@@ -28,11 +28,13 @@ func TestReplaceStringBulletList(t *testing.T) {
 	cases := []struct {
 		in, want string
 	}{
-		{`
+		{
+			`
 - George Washington
 - John Adams
 * Thomas Jefferson
-* Abraham Lincoln`, `
+* Abraham Lincoln`,
+			`
 * George Washington
 * John Adams
 * Thomas Jefferson
@@ -42,6 +44,34 @@ func TestReplaceStringBulletList(t *testing.T) {
 		got := ReplaceStringBulletList(c.in)
 		if got != c.want {
 			t.Errorf("ReplaceStringBulletList(%q) == %q, want %q", c.in, got, c.want)
+		}
+	}
+}
+
+func TestReplaceStringNestedBulletList(t *testing.T) {
+	cases := []struct {
+		in, want string
+	}{
+		{
+			`
+* a
+  * b
+* a
+* a
+  * b
+    * c`,
+			`
+* a
+** b
+* a
+* a
+** b
+*** c`},
+	}
+	for _, c := range cases {
+		got := ReplaceStringNestedBulletList(c.in)
+		if got != c.want {
+			t.Errorf("ReplaceStringNestedBulletLiest(%q) == %q, want %q", c.in, got, c.want)
 		}
 	}
 }

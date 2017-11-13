@@ -3,28 +3,27 @@
 package mdtoconfluence
 
 import (
+	"fmt"
 	"regexp"
-	"strconv"
 	"strings"
 )
 
-// ReplaceHeading returns a heading formatted in confluence from markdown
-func ReplaceHeading(str string) string {
-	re := regexp.MustCompile(`^h[0-6]\. `)
-	matched := re.FindString(str)
-	if matched == "" {
+// ReplaceStringHeading returns a heading formatted in confluence from markdown
+func ReplaceStringHeading(str string) string {
+	re := regexp.MustCompile(`(#{1,6}).+\n`)
+	matches := re.FindAllStringSubmatch(str, -1)
+	if matches == nil {
 		return str
 	}
-	indexes := re.FindStringIndex(str)
-	re = regexp.MustCompile(`[0-6]`)
-	matched = re.FindString(str)
-	headingNumber, _ := strconv.Atoi(matched)
-	headingSlice := make([]string, 0)
-	for i := 0; i < headingNumber; i++ {
-		headingSlice = append(headingSlice, "#")
-	}
+	parsedSlice := make([]string, 0)
+	for _, match := range matches {
+		headingNumber := len(strings.Split(match[1], ""))
+		heading := fmt.Sprintf("h%v.", headingNumber)
+		re = regexp.MustCompile(`#{1,6}(.+\n)`)
+		rest := re.FindStringSubmatch(match[0])[1]
+		all := fmt.Sprintf(`%v%v`, heading, rest)
+		parsedSlice = append(parsedSlice, all)
 
-	headingSlice = append(headingSlice, str[indexes[1]-1:len(str)])
-	parsed := strings.Join(headingSlice, "")
-	return parsed
+	}
+	return strings.Join(parsedSlice, "")
 }
